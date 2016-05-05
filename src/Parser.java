@@ -4,6 +4,8 @@ import java.util.*;
 import java.util.regex.*;
 import javax.swing.JFileChooser;
 
+
+
 /**
  * The parser and interpreter. The top level parse function, a main method for
  * testing, and several utility methods are provided. You need to implement
@@ -37,9 +39,6 @@ public class Parser {
 		return null;
 	}
 	
-	private RobotProgramNode parseProgram (Scanner scan) {
-		return null;
-	}
 	/** For testing the parser without requiring the world */
 
 	public static void main(String[] args) {
@@ -90,10 +89,45 @@ public class Parser {
 	 */
 	static RobotProgramNode parseProgram(Scanner s) {
 		// THE PARSER GOES HERE
+		return parseStatement(s);
 
-		return null;
 	}
-
+	static RobotProgramNode parseStatement(Scanner s) {
+		if (s.hasNext("move|turnL|turnR|takeFuel|wait")){
+			return parseAction(s);
+		}
+		if (s.hasNext("loop")) {
+			return parseLoop(s);
+		}
+		else {
+			fail("Can't read", s);
+			return null;
+		}
+	}
+	static RobotProgramNode parseAction(Scanner s) {
+		String act;
+		if (!s.hasNext()) {
+			fail("Expectin action", s);
+		}
+		require(";", "Expecting ;", s);
+		return new Action(act);
+				
+	}
+	
+	static RobotProgramNode parseLoop(Scanner s){
+		RobotProgramNode block;
+		require("loop", "Expecting loop", s);
+		block = parseBlock(s);
+		return new Loop(block);				
+	}
+	
+	static RobotProgramNode parseBlock(Scanner s){
+		RobotProgramNode stmt;
+		require("{", "Expecting {", s);
+		stmt = parseStatement(s);
+		require("}", "Expecting",s);
+		return new Block(stmt);
+	}
 	// utility methods for the parser
 
 	/**
