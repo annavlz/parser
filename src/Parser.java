@@ -5,7 +5,6 @@ import java.util.regex.*;
 import javax.swing.JFileChooser;
 
 
-
 /**
  * The parser and interpreter. The top level parse function, a main method for
  * testing, and several utility methods are provided. You need to implement
@@ -24,7 +23,9 @@ public class Parser {
 			// the only time tokens can be next to each other is
 			// when one of them is one of (){},;
 			scan.useDelimiter("\\s+|(?=[{}(),;])|(?<=[{}(),;])");
-
+//			while(scan.hasNext()){
+//				System.out.println(scan.next());
+//			}
 			RobotProgramNode n = parseProgram(scan); // You need to implement this!!!
 
 			scan.close();
@@ -88,13 +89,16 @@ public class Parser {
 	 * PROG ::= STMT+
 	 */
 	static RobotProgramNode parseProgram(Scanner s) {
-		// THE PARSER GOES HERE
-		return parseStatement(s);
-
+		List<RobotProgramNode> children = new ArrayList<RobotProgramNode>();
+		while(s.hasNext()){
+			RobotProgramNode stmt = parseStatement(s);
+			children.add(stmt);
+		}
+		return new Prog(children);
 	}
 	static RobotProgramNode parseStatement(Scanner s) {
 		if (s.hasNext("move|turnL|turnR|takeFuel|wait")){
-			return parseAction(s);
+			return new Statement(parseAction(s));
 		}
 		if (s.hasNext("loop")) {
 			return parseLoop(s);
@@ -106,9 +110,10 @@ public class Parser {
 	}
 	static RobotProgramNode parseAction(Scanner s) {
 		String act;
-		if (!s.hasNext()) {
+		if (!s.hasNext("move|turnL|turnR|takeFuel|wait")) {
 			fail("Expectin action", s);
 		}
+		act = s.next();
 		require(";", "Expecting ;", s);
 		return new Action(act);
 				
@@ -122,13 +127,14 @@ public class Parser {
 	}
 	
 	static RobotProgramNode parseBlock(Scanner s){
-		RobotProgramNode stmt;
-		require("{", "Expecting {", s);
-		stmt = parseStatement(s);
-		require("}", "Expecting",s);
-		return new Block(stmt);
+		List<RobotProgramNode> stmts = new ArrayList<RobotProgramNode>();
+		require("\\{", "Expecting {", s);
+		do {
+			stmts.add(parseStatement(s));
+		} while(!s.hasNext("\\}"));		
+		require("\\}", "Expecting",s);
+		return new Block(stmts);
 	}
-	// utility methods for the parser
 
 	/**
 	 * Report a failure in the parser.
