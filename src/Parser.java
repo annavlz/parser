@@ -97,11 +97,17 @@ public class Parser {
 		return new Prog(children);
 	}
 	static RobotProgramNode parseStatement(Scanner s) {
-		if (s.hasNext("move|turnL|turnR|takeFuel|wait")){
+		if (s.hasNext("move|turnL|turnR|takeFuel|wait|shieldOn|shieldOff|turnAround")){
 			return new Statement(parseAction(s));
 		}
-		if (s.hasNext("loop")) {
+		else if (s.hasNext("loop")) {
 			return parseLoop(s);
+		}
+		else if (s.hasNext("if")) {
+			return parseIf(s);
+		}
+		else if (s.hasNext("while")){
+			return parseWhile(s);
 		}
 		else {
 			fail("Can't read", s);
@@ -110,9 +116,6 @@ public class Parser {
 	}
 	static RobotProgramNode parseAction(Scanner s) {
 		String act;
-		if (!s.hasNext("move|turnL|turnR|takeFuel|wait")) {
-			fail("Expectin action", s);
-		}
 		act = s.next();
 		require(";", "Expecting ;", s);
 		return new Action(act);
@@ -120,13 +123,13 @@ public class Parser {
 	}
 	
 	static RobotProgramNode parseLoop(Scanner s){
-		RobotProgramNode block;
+		Block block;
 		require("loop", "Expecting loop", s);
 		block = parseBlock(s);
 		return new Loop(block);				
 	}
 	
-	static RobotProgramNode parseBlock(Scanner s){
+	static Block parseBlock(Scanner s){
 		List<RobotProgramNode> stmts = new ArrayList<RobotProgramNode>();
 		require("\\{", "Expecting {", s);
 		do {
@@ -134,6 +137,47 @@ public class Parser {
 		} while(!s.hasNext("\\}"));		
 		require("\\}", "Expecting",s);
 		return new Block(stmts);
+	}
+	
+	static RobotProgramNode parseIf(Scanner s) {
+		Condition cond;
+		Block block;
+		require("if", "Expecting if", s);
+		require("\\(","Expecting (", s);
+		cond = parseCondition(s);
+		require("\\)","Expecting )", s);
+		block = parseBlock(s);
+		
+		return new If(cond, block);
+	}
+	
+	static Condition parseCondition (Scanner s) {
+		String oprt;
+		Sensor sen;
+		int num;
+		if (!s.hasNext("gt|lt|eq")) {
+			fail("Expectin condition", s);
+		}
+		oprt = s.next();
+		require("\\(","Expecting (", s);
+		sen = new Sensor (s.next());
+		require(",","Expecting ,", s);
+		num = s.nextInt();
+		require("\\)","Expecting )", s);
+		return new Condition(oprt, sen, num);
+	}
+	
+
+	static RobotProgramNode parseWhile(Scanner s) {
+		Condition cond;
+		Block block;
+		require("while", "Expecting while", s);
+		require("\\(","Expecting (", s);
+		cond = parseCondition(s);
+		require("\\)","Expecting )", s);
+		block = parseBlock(s);
+		
+		return new While(cond, block);
 	}
 
 	/**

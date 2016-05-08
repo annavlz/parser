@@ -19,6 +19,11 @@ public class Action implements RobotProgramNode {
 					break;
 		case "wait" : robot.idleWait();
 					break;
+		case "shieldOn" : robot.setShield(true);
+					break;
+		case "shieldOff" : robot.setShield(false);
+					break;
+		case "turnAround" : robot.turnAround();
 		}					
 	}
 }
