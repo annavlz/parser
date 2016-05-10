@@ -116,11 +116,45 @@ public class Parser {
 	}
 	static RobotProgramNode parseAction(Scanner s) {
 		String act;
+		Expression exp;
 		act = s.next();
+		if(s.hasNext("\\(")){
+			exp = parseExpression(s);	
+		}
 		require(";", "Expecting ;", s);
-		return new Action(act);
+		return new Action(act, exp);
 				
 	}
+	
+	static Expression parseExpression (Scanner s) {
+		RobotProgramNode ch;
+		require("\\(", "Expecting (", s);
+		if(s.hasNext("-?[1-9][0-9]*|0")){
+			ch = new Num(s.nextInt());
+		}
+		else if(s.hasNext("fuelLeft|oppLR|oppFB|numBarrels|barrelLR|barrelFB| wallDist")){
+			ch = new Sensor (s.next());
+		}
+		else if(s.hasNext("add|sub|mul|div")){
+			ch = parseOperator(s);
+		}
+		require("\\)", "Expecting )", s);
+		return new Expression(ch);
+	}
+	
+	static Operation parseOperator (Scanner s) {
+		String op;
+		Expression exL;
+		Expression exR;
+		op = s.next();
+		require("\\(", "Expecting (", s);
+		exL = parseExpression(s);
+		require(",", "Expecting ,", s);
+		exR = parseExpression(s);
+		require("\\)", "Expecting )", s);
+		return new Operation(op, exL, exR);
+	}
+	
 	
 	static RobotProgramNode parseLoop(Scanner s){
 		Block block;
@@ -160,7 +194,9 @@ public class Parser {
 		}
 		oprt = s.next();
 		require("\\(","Expecting (", s);
-		sen = new Sensor (s.next());
+		if(s.hasNext("fuelLeft|oppLR|oppFB|numBarrels|barrelLR|barrelFB| wallDist")){
+			sen = new Sensor (s.next());
+		}	
 		require(",","Expecting ,", s);
 		num = s.nextInt();
 		require("\\)","Expecting )", s);
