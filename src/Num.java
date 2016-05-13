@@ -1,4 +1,4 @@
-public 	class Num implements RobotProgramNode {
+public 	class Num implements RobotCalcNode {
 	final int number;
 
 	public Num(int num) {
@@ -8,11 +8,7 @@ public 	class Num implements RobotProgramNode {
 		return number + "";
 	}
 	@Override
-	public void execute(Robot robot) {
-
-	}
-	
-	public int getNum() {
+	public int calculate (Robot robot) {
 		return this.number;
 	}
 }

@@ -2,12 +2,12 @@ public class Action implements RobotProgramNode {
 	final String act;
 	final Expression exp;
 	
+
 	public Action(String act, Expression exp) {
 		this.act = act;
-		if(exp != null){
-			this.exp = exp;
-		}
+		this.exp = exp;
 	}
+	
 	public String toString() {
 		return act;
 	}
@@ -16,7 +16,7 @@ public class Action implements RobotProgramNode {
 		switch(act) {
 		case "move" : 
 					if(exp != null){
-						for(int i = 0; i < exp.execute(robot); i++){
+						for(int i = 0; i < exp.calculate(robot); i++){
 							robot.move();
 						}	
 					}
@@ -32,7 +32,7 @@ public class Action implements RobotProgramNode {
 					break;
 		case "wait" : 			
 					if(exp != null){
-						for(int i = 0; i < exp.execute(robot); i++){
+						for(int i = 0; i < exp.calculate(robot); i++){
 							robot.idleWait();
 						}	
 					}

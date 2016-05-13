@@ -1,4 +1,4 @@
-public 	class Operation implements RobotProgramNode {
+public 	class Operation implements RobotCalcNode {
 	final String op;
 	final Expression exL;
 	final Expression exR;
@@ -12,8 +12,19 @@ public 	class Operation implements RobotProgramNode {
 		return op + "(" + exL + "," + exR + ")";
 	}
 	@Override
-	public void execute(Robot robot) {
-
+	public int calculate(Robot robot) {
+		int value = 0;
+		switch (op) {
+			case "add" : value = exL.calculate(robot) + exR.calculate(robot);
+					break;
+			case "sub" : value = exL.calculate(robot) - exR.calculate(robot);
+					break;
+			case "mul" : value = exL.calculate(robot) * exR.calculate(robot);
+					break;
+			case "div" : value = exL.calculate(robot) / exR.calculate(robot);
+					break;
+		}
+		return value;
 	}
 }
 

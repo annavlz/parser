@@ -121,13 +121,16 @@ public class Parser {
 		if(s.hasNext("\\(")){
 			exp = parseExpression(s);	
 		}
+		else{
+			exp = null;
+		}
 		require(";", "Expecting ;", s);
 		return new Action(act, exp);
 				
 	}
 	
 	static Expression parseExpression (Scanner s) {
-		RobotProgramNode ch;
+		RobotCalcNode ch;
 		require("\\(", "Expecting (", s);
 		if(s.hasNext("-?[1-9][0-9]*|0")){
 			ch = new Num(s.nextInt());
@@ -137,6 +140,9 @@ public class Parser {
 		}
 		else if(s.hasNext("add|sub|mul|div")){
 			ch = parseOperator(s);
+		}
+		else {
+			ch = null;
 		}
 		require("\\)", "Expecting )", s);
 		return new Expression(ch);
@@ -174,18 +180,26 @@ public class Parser {
 	}
 	
 	static RobotProgramNode parseIf(Scanner s) {
-		Condition cond;
-		Block block;
+		RobotProgramNode block;
+		RobotEvalNode cond;
 		require("if", "Expecting if", s);
 		require("\\(","Expecting (", s);
-		cond = parseCondition(s);
+		if(s.hasNext("lt|gt|eq")){
+			cond = parseConditionI(s);
+		}
+		else if(s.hasNext("and|or|not")){
+			cond = parseConditionB(s);
+		}
+		else {
+			fail("Can't read", s);
+		}
 		require("\\)","Expecting )", s);
 		block = parseBlock(s);
 		
-		return new If(cond, block);
+		return new IfNode(cond, block);
 	}
 	
-	static Condition parseCondition (Scanner s) {
+	static RobotEvalNode parseConditionI (Scanner s) {
 		String oprt;
 		Sensor sen;
 		int num;
@@ -196,11 +210,35 @@ public class Parser {
 		require("\\(","Expecting (", s);
 		if(s.hasNext("fuelLeft|oppLR|oppFB|numBarrels|barrelLR|barrelFB| wallDist")){
 			sen = new Sensor (s.next());
-		}	
+		}
+		else {
+			sen = null;
+		}
 		require(",","Expecting ,", s);
 		num = s.nextInt();
 		require("\\)","Expecting )", s);
-		return new Condition(oprt, sen, num);
+		return new ConditionI(oprt, sen, num);
+	}
+	
+	static RobotEvalNode parseConditionB (Scanner s) {
+		String oprt;
+		Sensor sen;
+		int num;
+		if (!s.hasNext("gt|lt|eq")) {
+			fail("Expectin condition", s);
+		}
+		oprt = s.next();
+		require("\\(","Expecting (", s);
+		if(s.hasNext("fuelLeft|oppLR|oppFB|numBarrels|barrelLR|barrelFB| wallDist")){
+			sen = new Sensor (s.next());
+		}
+		else {
+			sen = null;
+		}
+		require(",","Expecting ,", s);
+		num = s.nextInt();
+		require("\\)","Expecting )", s);
+		return new ConditionB(oprt, sen, num);
 	}
 	
 

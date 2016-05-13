@@ -6,8 +6,8 @@
  */
 
 interface RobotProgramNode {
-	int value = 0;
+
 	public void execute(Robot robot);
-	
+
 }
 

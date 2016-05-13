@@ -1,6 +1,5 @@
-public 	class Sensor implements RobotProgramNode {
+public 	class Sensor implements RobotCalcNode {
 	final String name;
-	int value;
 	
 	public Sensor(String name) {
 		this.name = name;
@@ -9,7 +8,8 @@ public 	class Sensor implements RobotProgramNode {
 		return name;
 	}
 	@Override
-	public void execute(Robot robot) {
+	public int calculate(Robot robot) {
+		int value = 0;
 		switch (name){
 			case "fuelLeft" : value = robot.getFuel();
 								break;
@@ -26,9 +26,6 @@ public 	class Sensor implements RobotProgramNode {
 			case "wallDist" : value = robot.getDistanceToWall();
 								break;
 		}
-
-	}
-	public int getValue() {
-		return this.value;
+		return value;
 	}
 }

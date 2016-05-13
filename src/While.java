@@ -1,9 +1,8 @@
 public 	class While implements RobotProgramNode {
-	final Condition condition;
-	final Block block;
-	Boolean bool;
+	final  RobotEvalNode condition;
+	final RobotProgramNode block;
 	
-	public While(Condition cond, Block block) {
+	public While(RobotEvalNode cond, RobotProgramNode block) {
 		this.condition = cond;
 		this.block = block;
 	}
@@ -12,9 +11,7 @@ public 	class While implements RobotProgramNode {
 	}
 	@Override
 	public void execute(Robot robot) {
-		condition.execute(robot);
-		bool = condition.getBool();
-		while (bool){
+		while (condition.evaluate(robot)){
 			block.execute(robot);
 		}
 	}

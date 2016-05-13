@@ -9,6 +9,6 @@ public 	class Loop implements RobotProgramNode {
 	}
 	@Override
 	public void execute(Robot robot) {
-		this.block.execute(robot);
+		block.execute(robot);
 	}
 }
