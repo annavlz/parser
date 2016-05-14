@@ -118,7 +118,9 @@ public class Parser {
 		Expression exp;
 		act = s.next();
 		if(s.hasNext("\\(")){
-			exp = parseExpression(s);	
+			require("\\(", "Expecting (", s);
+			exp = parseExpression(s);
+			require("\\)", "Expecting )", s);
 		}
 		else{
 			exp = null;
@@ -133,13 +135,14 @@ public class Parser {
 		if(s.hasNext("-?[1-9][0-9]*|0")){
 			ch = new Num(s.nextInt());
 		}
-		else if(s.hasNext("fuelLeft|oppLR|oppFB|numBarrels|barrelLR|barrelFB| wallDist")){
+		else if(s.hasNext("fuelLeft|oppLR|oppFB|numBarrels|barrelLR|barrelFB|wallDist")){
 			ch = new Sensor (s.next());
 		}
 		else if(s.hasNext("add|sub|mul|div")){
 			ch = parseOperator(s);
 		}
 		else {
+			fail("Can't read", s);
 			ch = null;
 		}
 		return new Expression(ch);
@@ -212,41 +215,45 @@ public class Parser {
 		oprt = s.next();
 		require("\\(","Expecting (", s);
 		expL = parseExpression(s);
-		if(s.hasNext(",")){
-			require(",","Expecting ,", s);
-			expR = parseExpression(s);
-		}
-		else {
-			expR = null;
-		}
+		require(",","Expecting ,", s);
+		expR = parseExpression(s);
 		require("\\)","Expecting )", s);
 		return new ConditionI(oprt, expL, expR);
 	}
 	
 	static RobotEvalNode parseConditionB (Scanner s) {
-		String oprt = null;
+		String oprt;
 		RobotEvalNode condL;
 		RobotEvalNode condR = null;
-		if (s.hasNext("gt|lt|eq")) {
+		oprt = s.next();
+		require("\\(","Expecting (", s);
+		if (s.hasNext("gt|lt|eq")) {		
 			condL = parseConditionI(s);
 		}
 		else if(s.hasNext("and|or|not")){
-			oprt = s.next();
-			require("\\(","Expecting (", s);
 			condL = parseConditionB(s);
-			if(s.hasNext(",")){
-				require(",","Expecting ,", s);
-				condR = parseConditionB(s);
-			}
-			else {
-				condR = null;
-			}
-			require("\\)","Expecting )", s);
 		}
 		else {
 			fail("Can't read", s);
 			condL = null;
 		}
+		if(s.hasNext(",")){
+			require(",","Expecting ,", s);
+			if (s.hasNext("gt|lt|eq")) {		
+				condR = parseConditionI(s);
+			}
+			else if(s.hasNext("and|or|not")){
+				condR = parseConditionB(s);
+			}
+			else {
+				fail("Can't read", s);
+				condR = null;
+			}
+		}
+		else {
+			condR = null;
+		}
+		require("\\)","Expecting )", s);
 		return new ConditionB(oprt, condL, condR);
 	}
 	

@@ -14,7 +14,12 @@ public 	class ConditionB implements RobotEvalNode {
 	
 
 	public String toString() {
-		return operation + "(" + condL + "," + condR + ")";
+		String str = operation + "(" + condL;
+		if(condR != null){
+			str += "," + condR;
+		}
+		str +=  ")";
+		return str;
 	}
 	@Override
 	public boolean evaluate(Robot robot) {

@@ -22,11 +22,9 @@ public 	class IfNode implements RobotProgramNode {
 	@Override
 	public void execute(Robot robot) {
 		if(condition.evaluate(robot)){
-			System.out.println("if true");
 			block.execute(robot);
 		} 
 		else {
-			System.out.println("if false");
 			elseBlock.execute(robot);
 		}
 

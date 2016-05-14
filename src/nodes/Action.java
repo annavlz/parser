@@ -12,7 +12,11 @@ public class Action implements RobotProgramNode {
 	}
 	
 	public String toString() {
-		return act;
+		String str = act + "";
+		if(exp != null){
+			str += exp;
+		}
+		return str;
 	}
 
 	public void execute(Robot robot) {

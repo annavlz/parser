@@ -8,7 +8,7 @@ public class Expression implements RobotCalcNode{
 		this.child = ch;
 	}
 	public String toString() {
-		return "(" + child + ")";
+		return child + "";
 	}
 	public int calculate (Robot robot){
 		return child.calculate(robot);
